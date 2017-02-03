@@ -1,8 +1,10 @@
-# Letharia
+# Annotation of *Letharia* MAT locus
 
 All scripts related to genome annotation of the genus *Letharia*, designed to be run in [UPPMAX](https://www.uppmax.uu.se/) (Uppsala Multidisciplinary Center for Advanced Computational Science) as part of the lichen projects in [Johannesson Lab](http://www.iob.uu.se/research/systematic-biology/johannesson/) (Uppsala University).
 
-In the directory `Training_Files` you can find the training files obtained for the *ab initio* gene prediction programs SNAP ([Korf, 2004](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-5-59)), Augustus ([Stanke and Waack, 2003](http://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/bioinformatics/19/suppl_2/10.1093/bioinformatics/btg1080/2/btg1080.pdf?Expires=1486485018&Signature=cP369aPiM8h0yRrtGGMbqNUVCuffyrWzGjiS5CItfQGN27Gp5i1MLYP69u4tRrDgbRV-e13zj769V9uVO6vKaJX8946e1a6U0QhQ5RIK4rYqXRKTDnC92h3wubW2LgCHMY4xjw4oFvOfAhbsEiwyoYMhSFEpfuS5m7PHLW9sgnMIIB6JOELjZ6lSetEi8k8rQdIned~yI4Fb39LV5FQViT8uneLGL4aug3f3w6M9XvpkSFIveLc5keewO1iNAGcQSnrx1rjfE7Jtgpp178CP5jZh4DHxL5WHSn6IS~K4uVoRK5YMkDjGrg4bRUqX04nSsFiTd0w7yFbes0jrHyCRmg__&Key-Pair-Id=APKAIUCZBIA4LVPAVW3Q)) and GeneMark-ES ([Lomsadze et al., 2005](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1298918/); [Ter-hovhannisyan et al., 2008](http://genome.cshlp.org/content/18/12/1979.long)). All training was performed on the SPAdes assembly of a pure culture of *Letharia lupina* (see Tuovinen et al. (in prep.); coming soon, I promise!).
+Notice that while the scripts cannot be run by other users as they are, if modified slightly (for paths, mostly) they can be useful to you if you're doing some fungal annotation. Even if you're not working in UPPMAX sometimes is nice to see the command line used by other people. The real purpose of putting them here in GitHub is to be transparent on exactly how I did the analysis of the paper Tuovinen et al. (in prep.; coming soon, I promise!)
+
+In the directory `Training_Files` you can find the training files obtained for the *ab initio* gene prediction programs SNAP ([Korf, 2004](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-5-59)), Augustus ([Stanke and Waack, 2003](http://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/bioinformatics/19/suppl_2/10.1093/bioinformatics/btg1080/2/btg1080.pdf?Expires=1486485018&Signature=cP369aPiM8h0yRrtGGMbqNUVCuffyrWzGjiS5CItfQGN27Gp5i1MLYP69u4tRrDgbRV-e13zj769V9uVO6vKaJX8946e1a6U0QhQ5RIK4rYqXRKTDnC92h3wubW2LgCHMY4xjw4oFvOfAhbsEiwyoYMhSFEpfuS5m7PHLW9sgnMIIB6JOELjZ6lSetEi8k8rQdIned~yI4Fb39LV5FQViT8uneLGL4aug3f3w6M9XvpkSFIveLc5keewO1iNAGcQSnrx1rjfE7Jtgpp178CP5jZh4DHxL5WHSn6IS~K4uVoRK5YMkDjGrg4bRUqX04nSsFiTd0w7yFbes0jrHyCRmg__&Key-Pair-Id=APKAIUCZBIA4LVPAVW3Q)) and GeneMark-ES ([Lomsadze et al., 2005](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1298918/); [Ter-hovhannisyan et al., 2008](http://genome.cshlp.org/content/18/12/1979.long)). All training was performed on the SPAdes assembly of a pure culture of *Letharia lupina* (see Tuovinen et al. (in prep.)).
 
 The following notes describe how I ran my UPPMAX scripts, but notice I skipped the call to `sbatch` for all scripts, for clarity. So in effect the scripts might be called like such:
 
@@ -28,7 +30,7 @@ Following the instructions from the [MAKER tutorial](http://gmod.org/wiki/MAKER_
 The script to run and self-train GeneMark (called `gmes_petap.pl` and provided with the program) has some perl dependencies that are now installed in Uppmax. The instructions looks straight forward, so I only checked [this](https://wiki.gacrc.uga.edu/wiki/GeneMark) website, and the help menu. I ran it like this:
 
     # Self-training algorithm GeneMark-ES/4.32-es
-    $pathToGeneMark/gmes_petap.pl --ES --fungus --cores $CORES --max_intron 3000 --min_gene_prediction 120 -v --sequence $GENOME
+    $ $pathToGeneMark/gmes_petap.pl --ES --fungus --cores $CORES --max_intron 3000 --min_gene_prediction 120 -v --sequence $GENOME
 
 I'm not giving it any hints. It took less than half an hour. I was very happy with GeneMark-ES results: they matched the Cufflinks transcripts very well.
 
