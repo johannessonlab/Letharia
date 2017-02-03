@@ -10,6 +10,9 @@ The following notes describe how I ran my UPPMAX scripts, but notice I skipped t
 
 See the Milou guide about how to run UPPMAX jobs [here](http://www.uppmax.uu.se/support-sv/user-guides/milou-user-guide/).
 
+**Things to do for this repo**
+2017.02.03: I still need to add some missing python scripts that are called by the bash scripts.
+
 ## Training of *ab initio* gene predictors
 
 For all training I used an assembly multifasta file that excluded all contigs smaller than 50000bp (called `L.lupinapure.scaffolds_ed.fa`).
@@ -22,13 +25,12 @@ Following the instructions from the [MAKER tutorial](http://gmod.org/wiki/MAKER_
 
 ### Creating an GeneMark HMM file
 
-The script to run and self-train GeneMark (called `gmes_petap.pl` and provided with the program) has some perl dependencies that are now installed in Uppmax. The instructions looks straight forward, so I only checked [this](https://wiki.gacrc.uga.edu/wiki/GeneMark) website, and the help menu. I prepared a script for it and run it as such:
+The script to run and self-train GeneMark (called `gmes_petap.pl` and provided with the program) has some perl dependencies that are now installed in Uppmax. The instructions looks straight forward, so I only checked [this](https://wiki.gacrc.uga.edu/wiki/GeneMark) website, and the help menu. I ran it like this:
 
-    $ ./GeneMarkhmm.sh L.lupinapure.scaffolds_ed.fa
+    # Self-training algorithm GeneMark-ES/4.32-es
+    $pathToGeneMark/gmes_petap.pl --ES --fungus --cores $CORES --max_intron 3000 --min_gene_prediction 120 -v --sequence $GENOME
 
-I'm running it with options `--ES --fungus --max_intron 3000 --min_gene_prediction 120`. I'm not giving it any hints. It took less than half an hour.
-
-I was very happy with GeneMark-ES results: they matched the Cufflinks transcripts very well.
+I'm not giving it any hints. It took less than half an hour. I was very happy with GeneMark-ES results: they matched the Cufflinks transcripts very well.
 
 ### Creating an Augustus HMM file
 
@@ -76,13 +78,14 @@ Where `$SOMEPATH` is related to the directory where you run my script `mapRNA_ST
 
 I used Exonerate ([Slater & Birney, 2005](http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-6-31)) to make splice aware aligners of orthologs of SLA2 and APN2 from *Aspergillus oryzae* (protein sequence) that I took from the OrthoMCL-DB. I also took the MAT1-1-1 (or alpha) and MAT1-2-1 (HMG) genes of *Xanthoria polycarpa* (Accession numbers AJ884598 and AJ884599). All these protein sequences were in the file `Ref_MATgenes_aa.fa` and I only aligned it to the relevant scaffolds for each species (in this case `L.lupinapure_Spades_MAT-scaffold.fas`).
 
-    $ ./runExonerate.sh Ref_MATgenes_aa.fa L.lupinapure_Spades_MAT-scaffold.fas
+To run Exonerate I did:
+
+    # Exhaustive search but restricting size of introns to 1000bp tops
+    $ exonerate --model protein2genome Ref_MATgenes_aa.fa L.lupinapure_Spades_MAT-scaffold.fas --exhaustive TRUE --maxintron 1000 --ryo ">%ti_%g_%tab-%tae\n%tas\n" --showtargetgff > Output_exhaustive.txt 
 
 ### Running EVidenceModeler
 
-I ran EVidenceModeler (EVM) v.1.1.1 following the instructions in the [documentation](https://evidencemodeler.github.io/), all in a single script.
-
-I put all the gff3 files from the previous steps in the directory `InputEvidence`. The EVM weights file was also there. The weights file (prepared based on several trials) of *L. lupina*, *L. columbiana*, and *L. rugosa*:
+I ran EVidenceModeler (EVM) v.1.1.1 following the instructions in the [documentation](https://evidencemodeler.github.io/), exactly as they show it. The weights file (prepared based on several trials) of *L. lupina*, *L. columbiana*, and *L. rugosa*:
 
     $ cat lupina_weights.txt
     ABINITIO_PREDICTION Augustus    1
@@ -101,32 +104,5 @@ For *L. vulpina* a different set of weights was better to recover proper models:
     TRANSCRIPT  Cufflinks   10
     OTHER_PREDICTION    transdecoder    1
 
-Finally, run EVM:
 
-    $ cd ..
-    $ ./EVM.sh -g L.lupinapure_Spades_MAT-scaffold.fas -w InputEvidence/lupina_weights.txt -p InputEvidence/lupina_predicted.gff3 -a InputEvidence/lupina_exonerate.gff3 -r InputEvidence/lupina_transcripts.gff3 -s lupina
-
-The output looks like this:
-
-    $ ll
-    total 160
-    drwxrwsr-x 2 sandral 2048 Jan  2 08:00 InputEvidence
-    -rw-rw-r-- 1 sandral 1566 Jan  2 08:00 lupina_commands.list
-    -rw-rw-rw- 1 sandral  546 Jan  2 08:00 lupina_partitions_list.out
-    -rw-rw-r-- 1 sandral 1576 Jan  2 08:01 lupina_run.log
-    drwxrwsrwx 4 sandral 2048 Jan  2 08:01 NODE_87_length_133277_cov_84.8955
-
-And
-
-    $ ll NODE_87_length_133277_cov_84.8955/
-    total 800
-    -rw-rw-rw- 1 sandral 135534 Jan  2 08:00 L.lupinapure_Spades_MAT-scaffold.fas
-    -rw-rw-r-- 1 sandral  66041 Jan  2 08:01 lupina_evm.out
-    -rw-rw-r-- 1 sandral  81501 Jan  2 08:01 lupina_evm.out.gff3
-    -rw-rw-rw- 1 sandral   2971 Jan  2 08:00 lupina_exonerate.gff3_EVM
-    -rw-rw-rw- 1 sandral 299545 Jan  2 08:00 lupina_predicted.gff3
-    -rw-rw-rw- 1 sandral  21847 Jan  2 08:00 lupina_transcripts.gff3_EVM
-    drwxrwsrwx 2 sandral   2048 Jan  2 08:00 NODE_87_length_133277_cov_84.8955_1-100000
-    drwxrwsrwx 2 sandral   2048 Jan  2 08:01 NODE_87_length_133277_cov_84.8955_90001-133277
-
-Our precious almost final annotation file is `lupina_evm.out.gff3`. I then compared all the species evidence, fixed a few details of intron-exon boundaries in Artemis ([Rutherford et al. 2000](https://www.ncbi.nlm.nih.gov/pubmed/11120685)), and finally got the final annotations. 
+After running EVM I compared all the species evidence, fixed a few details of intron-exon boundaries in Artemis ([Rutherford et al. 2000](https://www.ncbi.nlm.nih.gov/pubmed/11120685)), and finally got the final annotations. 
