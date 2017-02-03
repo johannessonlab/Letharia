@@ -1,3 +1,6 @@
 # Letharia
 
-All scripts related to genome annotation of the genus Letharia, designed to be run in UPPMAX (Uppsala Multidisciplinary Center for Advanced Computational Science).
+All scripts related to genome annotation of the genus *Letharia*, designed to be run in [UPPMAX](https://www.uppmax.uu.se/) (Uppsala Multidisciplinary Center for Advanced Computational Science) as part of the lichen projects in [Johannesson Lab](http://www.iob.uu.se/research/systematic-biology/johannesson/) (Uppsala University).
+
+In the directory `Training_Files` you can find the training files obtained for the *ab initio* gene prediction programs SNAP ([Korf, 2004](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-5-59)), Augustus ([Stanke and Waack, 2003](http://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/bioinformatics/19/suppl_2/10.1093/bioinformatics/btg1080/2/btg1080.pdf?Expires=1486485018&Signature=cP369aPiM8h0yRrtGGMbqNUVCuffyrWzGjiS5CItfQGN27Gp5i1MLYP69u4tRrDgbRV-e13zj769V9uVO6vKaJX8946e1a6U0QhQ5RIK4rYqXRKTDnC92h3wubW2LgCHMY4xjw4oFvOfAhbsEiwyoYMhSFEpfuS5m7PHLW9sgnMIIB6JOELjZ6lSetEi8k8rQdIned~yI4Fb39LV5FQViT8uneLGL4aug3f3w6M9XvpkSFIveLc5keewO1iNAGcQSnrx1rjfE7Jtgpp178CP5jZh4DHxL5WHSn6IS~K4uVoRK5YMkDjGrg4bRUqX04nSsFiTd0w7yFbes0jrHyCRmg__&Key-Pair-Id=APKAIUCZBIA4LVPAVW3Q)) and GeneMark-ES ([Lomsadze et al., 2005](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1298918/); [Ter-hovhannisyan et al., 2008](http://genome.cshlp.org/content/18/12/1979.long)). 
+
