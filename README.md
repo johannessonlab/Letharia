@@ -76,7 +76,7 @@ Within the script I specify that we have stranded RNAseq data.
 
 Where `$SOMEPATH` is related to the directory where you run my script `mapRNA_STAR.sh`.
 
-### Aligning the MAT idiomorph proteins with Exonerate
+### Aligning the MAT idiomorph proteins with Exonerate
 
 I used Exonerate ([Slater & Birney, 2005](http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-6-31)) to make splice aware aligners of orthologs of SLA2 and APN2 from *Aspergillus oryzae* (protein sequence) that I took from the OrthoMCL-DB. I also took the MAT1-1-1 (or alpha) and MAT1-2-1 (HMG) genes of *Xanthoria polycarpa* (Accession numbers AJ884598 and AJ884599). All these protein sequences were in the file `Ref_MATgenes_aa.fa` and I only aligned it to the relevant scaffolds for each species (in this case `L.lupinapure_Spades_MAT-scaffold.fas`).
 
