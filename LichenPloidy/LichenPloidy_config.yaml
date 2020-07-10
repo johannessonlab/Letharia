@@ -1,0 +1,30 @@
+# Configuration file of LichenPloidy: Small pipeline to infer the ploidy of a genome or metagenome
+# ==================================================
+# Sandra Lorena Ament Velasquez
+# Johannesson Lab, Evolutionary Biology Center, Uppsala University, Sweden
+# 2020/06/15 - 2020/07/10
+# +++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+# Illumina reads path:
+Illumina: "data"
+
+# The reference genome
+reference: "path/to/L.lupinapure.scaffolds.fasta"
+
+# Annotation file of the scaffold containing the MAT idiomorph
+gffmat: "data/MAT_lupina.sorted_Slice_46010_0.gff"
+
+# List of samples to analyze
+samples: ["L.columbiana", "L.lupina", "L.lupinapure_postQC", "L.rugosa", "L.vulpina"]
+refsampleid: "lupinapure" # name for the reference genome 
+
+# Repeats library from RepeatModeler
+TElibrary: "path/to/lelup-families.fa" # Kindly provided by Sean McKenzie
+TElibraryid: "lelup-families" # A name for the modified repeat library  
+
+# Minimum size of a scaffold to be retained for the Minor Allele Frequency distribution
+minlen: 100000 # In base pairs
+
+PloidyMAF: "scripts/PloidyMAF_Letharia.R"
+HomoeologsDistance: "scripts/HomoeologsDistance.R"
