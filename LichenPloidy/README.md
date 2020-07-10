@@ -6,6 +6,7 @@ TODO:
 - Put McKenzie TE library?
 - Add RepeatsLelup.R
 - Add the pipeline itself haha
+- Add the R scripts in general
 
 
 **Last update date: 2020/07/10**
