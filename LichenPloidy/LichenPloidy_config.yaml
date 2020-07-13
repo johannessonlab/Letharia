@@ -16,8 +16,7 @@ reference: "data/L.lupinapure.scaffolds.fasta"
 gffmat: "data/MAT_lupina.sorted_Slice_46010_0.gff"
 
 # List of samples to analyze
-# samples: ["L.columbiana", "L.lupina", "L.lupinapure_postQC", "L.rugosa", "L.vulpina"]
-samples: ["L.columbiana"]
+samples: ["L.columbiana", "L.lupina", "L.lupinapure_postQC", "L.rugosa", "L.vulpina"]
 refsampleid: "lupinapure" # name for the reference genome 
 
 # Repeats library from RepeatModeler

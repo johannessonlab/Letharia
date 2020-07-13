@@ -14,7 +14,7 @@ In addition, I also explore the distribution of alleles along the contigs and I 
 The pipeline relies on the following scripts:
 
 - PloidyMAF_Letharia.R
-- scripts/HomoeologsDistance.R
+- HomoeologsDistance.R
 
 The input data is:
 
@@ -24,7 +24,7 @@ The input data is:
 
 ## Building the environment
 
-First, I can start by updating conda.
+First, you can start by updating conda.
 
     $ conda update -n base conda
 
@@ -36,12 +36,10 @@ Activate the environment and install more things
 
     $ conda activate VariantsGATK4
 
-    $ conda install -c bioconda gatk4=4.1.7.0  # I ended up not using it
-    $ conda install bcftools=1.10.2  # I ended up not using it
+    $ conda install bcftools=1.10.2
     $ conda install vcftools=0.1.16
     $ conda install -c bioconda biopython=1.76
-    $ conda install varscan=2.4.4 
-    $ conda install -c bioconda mummer4=4.0.0beta2 
+    $ conda install varscan=2.4.4
     $ conda install -c bioconda repeatmasker=4.0.8
     $ conda install -c bioconda bedtools=2.29.2
     $ conda install -c bioconda htslib=1.10.2
@@ -114,7 +112,7 @@ Run the pipeline:
     $ conda activate VariantsGATK4
     $ snakemake --snakefile LichenPloidy.smk --configfile LichenPloidy_config.yaml -p --cluster "sbatch -A snicXXXX-X-XXX -p core -n {params.threads} -t {params.time} --mail-user xxxxx@xxxxxxx.xxx --mail-type=ALL" -j 10 --keep-going --use-conda &> LichenPloidy_snakemake.log &
 
-Where `snicXXXX-X-XXX` is your Uppmax project. 
+Where `snicXXXX-X-XXX` is your Uppmax project. Change also your email.
 
 ## Results
 
