@@ -1,3 +1,5 @@
+# -*- snakemake -*-
+
 ### LichenPloidy: Small pipeline to infer the ploidy of a genome or metagenome
 #############################################################################
 
