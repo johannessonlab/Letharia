@@ -2,14 +2,10 @@
 
 TODO:
 
-- Put SPAdes assembly of lupina culture?
-- Put McKenzie TE library?
-- Add RepeatsLelup.R
-- Add the pipeline itself haha
-- Add the R scripts in general
+- Put SPAdes assembly of lupina culture
+- Put McKenzie TE library
 
-
-**Last update date: 2020/07/10**
+----
 
 This pipeline is designed to calculate the minor allele frequency (MAF) distribution of a given sample based on the read counts of biallelic SNPs. In this case, the objective is to get MAF distributions of all *Letharia* samples using the *L. lupina* pure culture as a reference.
 
@@ -104,6 +100,8 @@ First, to get an idea of how the pipeline looks like we can make a rulegraph:
 In Mac, you need to install graphviz to run the following command. For that you can do `brew install graphviz` using Homebrew, for example. It otherwise works well in Ubuntu.
 
     $ snakemake --snakefile LichenPloidy.smk --configfile LichenPloidy_config.yaml --rulegraph | dot -Tpng > rulegraph.png
+
+![rulegraph](rulegraph.png "rulegraph")
 
 See if everything is ready to be ran:
     
