@@ -71,6 +71,8 @@ mafplot <- ggplot(vcfdf %>% filter(cov < 300 & cov > 50) %>% filter(maf >=0.01),
                                "L.lupina_culture" = "#c7e1a8ff",
                                "L.rugosa" = "#f9d5bdff", 
                                "L.vulpina" = "#b7d2fdff")) + 
+  theme(strip.text.x = element_text(size = 13),
+        axis.title=element_text(size=13)) + 
   guides(fill=FALSE) # Remove legend
 
 ggsave(plot = mafplot, snakemake@output$maf, width = 10, height = 2.5)
