@@ -28,7 +28,7 @@ library(tidyr) # For gather
 # ============================
 # Data
 # ============================
-cat("Reading data ...")
+cat("Reading data ...\n")
 vcf <- read.vcfR(snakemake@input$vcf, verbose = FALSE)
 gff_file <- snakemake@input$gff
 
@@ -56,7 +56,7 @@ levels(vcfdf$species)[levels(vcfdf$species) == "L.lupinapure_postQC"] <- "L.lupi
 # ============================
 # Plot MAF while excluding sites with bad coverage 
 # ============================
-cat("Plotting MAF distribution ...")
+cat("Plotting MAF distribution ...\n")
 # The filter for maf >= 0.01 is done because the pure culture has more coverage and thus can get smaller MAF than the metagenomes.
 # The tricky part in geom_histogram is there to rescale the histogram counts so that the bar areas sum 1, but per panel
 # https://stackoverflow.com/questions/4725339/percentage-on-y-lab-in-a-faceted-ggplot-barchart
@@ -80,7 +80,7 @@ ggsave(plot = mafplot, snakemake@output$maf, width = 10, height = 2.5)
 # ============================
 ## Plot the coverage (remove the super extreme ones)
 # ============================
-cat("Plotting coverage distribution ...")
+cat("Plotting coverage distribution ...\n")
 # vignette('sequence_coverage')
 covplot <- ggplot(vcfdf %>% filter(cov < 500), aes(x=species, y=cov)) + 
   geom_violin(fill="#C0C0C0", adjust=1.0, scale = "count", trim=TRUE) +
@@ -96,7 +96,7 @@ ggsave(plot = covplot, snakemake@output$cov, width = 6.5, height = 2.5)
 # ============================
 ## Plot the allele frequencies distribution unfolded
 # ============================
-cat("Plotting unfolded MAF distribution ...")
+cat("Plotting unfolded MAF distribution ...\n")
 #### ---- Get the fixed part of the vcf file
 vcffix <- getFIX(vcf) %>% data.frame # Extract the fixed part of the vcf
 
@@ -131,7 +131,7 @@ ggsave(plot = unfoldedMAF, snakemake@output$unmaf, width = 5, height = 3)
 # ============================
 ## Plot the allele frequencies along contigs in windows
 # ============================
-cat("Plotting allele frequencies along contigs ...")
+cat("Plotting allele frequencies along contigs ...\n")
 # Recover the length of the scaffold
 # vcfdf_lupinaMG_alleles %>% head %>% separate(POS, into = c("NODE", "n", "length", "actual_len", "cov2", "x", "SITE"), sep ="_")
 vcfdf_lupinaMG_df <- vcfdf_lupinaMG_alleles %>% separate(POS, into = c(NA, NA, NA, "len", NA, NA, "SITE"), sep ="_") # This makes the SITE column as character rather than factors
@@ -191,22 +191,31 @@ chrlines <- data.frame(CHROM = relevantchr$CHROM, len = relevantchr %>% separate
 ## Calculate the windows
 winmaf_lupina <- winmafperwin(vcfdf_lupinaMG_df %>% filter(allele == "ALT"), windowsize = 7500, chrlines = chrlines)
 
+## Make a data frame with arrows so I can highlight some particular areas
+arrowsloh <- data.frame(SITE = c(950000, 1550000, 1327000, 90000, 870000),
+                        cov_allele = c(0.6, 0.6, 0.3, 0.6, 0.6),
+                        y2 = c(0.3, 0.3, 0.6, 0.3, 0.3),
+                        species = "L.lupina",
+                        CHROM = c("NODE_1_length_1806572_cov_94.6139", "NODE_1_length_1806572_cov_94.6139", "NODE_2_length_1652252_cov_91.7152", "NODE_5_length_1381321_cov_89.3474", "NODE_7_length_1185015_cov_91.9694") )
+
 ## Finally plot the alternative allele frequency along the pure culture lupina reference
 vcfdf_lupinaMG_LOH <- ggplot(winmaf_lupina, aes(x = SITE, y = cov_allele)) + 
   facet_grid(CHROM ~ ., scales = "free") +
   xlab(expression(paste("Scaffold position (bp) in the ", italic("L. lupina"), " pure culture assembly"))) + 
-  ylab(expression(paste("Alternative allele frequency in the ", italic("L. lupina"), " metagenome reads"))) +
+  ylab(expression(paste('"Other" allele frequency in the ', italic("L. lupina"), " metagenome reads"))) +
   scale_y_continuous(limits = c(0, 1), breaks=c(0, 0.33, 0.66, 1)) + # Change the ticks to match the expectations
   geom_point(data = vcfdf_lupinaMG_df_ALT, aes(x = as.numeric(SITE), y = cov_allele), alpha = 0.1, size = 0.5, colour = "darkgoldenrod2") + # Plot the raw data too
   geom_line(size = 0.7, alpha = 0.8, colour = "darkgoldenrod3") +
-  theme_bw() 
+  geom_segment( aes(x = SITE, y = cov_allele, xend = SITE, yend = y2), data = arrowsloh, arrow = arrow(length = unit(0.08, "npc")) ) + # Put arrows
+  theme_bw() +
+  theme(strip.text.y = element_text(size = 4)) # Change the size of the scaffolds' name
 
 ggsave(plot = vcfdf_lupinaMG_LOH, snakemake@output$loh, width = 10, height = 10)
 
 # ============================
 ## Plot the allele frequencies along the mating type scaffold in windows
 # ============================
-cat("Plotting allele frequencies along the MAT contig ...")
+cat("Plotting allele frequencies along the MAT contig ...\n")
 # Genes in the idiomorph
 gff <- read.table(gff_file) %>% filter(V3 == "gene") %>% data.frame
 
@@ -244,4 +253,4 @@ vcfdf_lupinaMG_mat <- ggplot(winmaf_lupina_mat, aes(x = SITE, y = cov_allele, co
 
 ggsave(plot = vcfdf_lupinaMG_mat, snakemake@output$mat, width = 10, height = 3)
 
-cat("Done!")
+cat("Done!\n")
