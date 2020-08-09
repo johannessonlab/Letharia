@@ -186,7 +186,7 @@ lethariadiv_all <- rbind(cbind(region = paste0("Polymorphic (n = ", prematrix$PO
                          cbind(region = paste0("Fixed lupina (n = ", prematrix_reffix$POS %>% unique() %>% length(), ")" ), prematrix2distance(prematrix_reffix)) )
 
 # Replace the alternative lupina for the parts that are fixed for the pure culture with NAs
-lethariadiv_all <- lethariadiv_all %>% mutate(L.lupina_alt = ifelse(region == "Fixed lupina", NA, L.lupina_alt))
+lethariadiv_all <- lethariadiv_all %>% mutate(L.lupina_alt = ifelse(region == paste0("Fixed lupina (n = ", prematrix_reffix$POS %>% unique() %>% length(), ")" ), NA, L.lupina_alt))
 
 cat("Plotting ...\n")
 # Make a long format that ggplot likes
