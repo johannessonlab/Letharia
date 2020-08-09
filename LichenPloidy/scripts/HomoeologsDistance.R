@@ -180,12 +180,13 @@ prematrix2distance <- function(prematrix){
   return(lethariadiv)
 }
 
-lethariadiv_all <- rbind(cbind(region = "polymorphic", prematrix2distance(prematrix)),
-                         cbind(region = "fixed_alternative", prematrix2distance(prematrix_altfix)),
-                         cbind(region = "fixed_culture", prematrix2distance(prematrix_reffix)) )
+# Make a data frame with the distances and fancy names for the panels
+lethariadiv_all <- rbind(cbind(region = paste0("Polymorphic (n = ", prematrix$POS %>% unique() %>% length(), ")" ), prematrix2distance(prematrix)),
+                         cbind(region = paste0("Fixed other (n = ", prematrix_altfix$POS %>% unique() %>% length(), ")" ), prematrix2distance(prematrix_altfix)),
+                         cbind(region = paste0("Fixed lupina (n = ", prematrix_reffix$POS %>% unique() %>% length(), ")" ), prematrix2distance(prematrix_reffix)) )
 
 # Replace the alternative lupina for the parts that are fixed for the pure culture with NAs
-lethariadiv_all <- lethariadiv_all %>% mutate(L.lupina_alt = ifelse(region == "fixed_culture", NA, L.lupina_alt))
+lethariadiv_all <- lethariadiv_all %>% mutate(L.lupina_alt = ifelse(region == "Fixed lupina", NA, L.lupina_alt))
 
 cat("Plotting ...\n")
 # Make a long format that ggplot likes
@@ -197,8 +198,8 @@ distanceplot <- ggplot(lethariadiv_all_long, aes(x = Species, y = Distance, colo
   facet_grid(. ~ region) +
   theme_bw() + 
   ylim(0, 1) +
-  scale_color_manual(values = c("darkgoldenrod3", "chartreuse4"), labels = c("other", "culture")) + # Lupina is green in the phylogenies
-  scale_shape_manual(values = c(19, 15), labels = c("other", "culture"))
+  scale_color_manual(values = c("darkgoldenrod3", "chartreuse4"), labels = c("other", "lupina")) + # Lupina is green in the phylogenies
+  scale_shape_manual(values = c(19, 15), labels = c("other", "lupina"))
 
 # ggsave(plot = distanceplot, "/Users/Lorena/Dropbox/PhD_UU/Analyses/Letharia/3_LethariaPloidy/results/Lichens-snps-miss1-100kp_MAF-noTEs_distance.pdf", width = 8.3, height = 3.2)
 ggsave(plot = distanceplot, snakemake@output$distance, width = 8.3, height = 3.2)
