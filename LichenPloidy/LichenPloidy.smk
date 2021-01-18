@@ -72,7 +72,6 @@ rule referencegenome:
 rule neededscripts:
 	""" Get the scripts needed for the rest of the pipeline """
 	# About ancient() see https://bitbucket.org/snakemake/snakemake/pull-requests/119/ancient-flag-on-input-files/diff
-	# Ignore the time stamp if it's newer to avoid re-running the rule
 	output:
 		"scripts/renameRMDLconsensi.pl",
 		"scripts/totalcovergff.py"
@@ -172,26 +171,6 @@ rule markduplicates:
 		# #                               false. This option can be set to 'null' to clear the default value. Possible values:
 		# #                               true, false
 		# # TMP_DIR (File)  Default value: null. This option may be specified 0 or more times.
-
-rule indexsanddict:
-	""" Index reference and dictionary for GATK """ 
-	input:
-		genome = f"data/{refsampleid}.fa",
-	output:
-		indexsamtools = f"data/{refsampleid}.fa.fai",
-		diction = f"data/{refsampleid}.dict"
-	params:
-		time = "1:00:00",
-		threads = 1,
-	version: "1.1"
-	shell:
-		"""
-		# Make an reference index
-		samtools faidx {input.genome}
-
-		# Make a reference dictionary
-		picard CreateSequenceDictionary R={input.genome} O={output.diction}
-		"""	
 
 # -------------- VarScan -----------------
 
