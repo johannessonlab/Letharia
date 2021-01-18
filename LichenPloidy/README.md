@@ -21,6 +21,7 @@ The input data is:
 - A reference genome: the SPAdes assembly of the pure culture *L. lupina*
 - A small gff containing the annotation of the MAT region in the reference genome
 - The RepeatLibrary produced in [McKenzie et al. (2020) Genomics](https://www.sciencedirect.com/science/article/pii/S0888754320304614), kindly provided by Sean McKenzie.
+- The Illumina reads of each sample in the configuration file. For the paper, these are available in [NCBI’s Short Read Archive](https://www.ncbi.nlm.nih.gov/sra) under the bioprojects PRJNA523679 and PRJNA473595.
 
 ## Building the environment
 
@@ -30,11 +31,11 @@ First, you can start by updating conda.
 
 Now, to create the environment.
 
-    $ conda create -n VariantsGATK4 -c bioconda snakemake-minimal=5.19.2 picard=2.23.0 bwa=0.7.17 samtools=1.10 
+    $ conda create -n Variants -c bioconda snakemake-minimal=5.19.2 picard=2.23.0 bwa=0.7.17 samtools=1.10 
 
 Activate the environment and install more things
 
-    $ conda activate VariantsGATK4
+    $ conda activate Variants
 
     $ conda install bcftools=1.10.2
     $ conda install vcftools=0.1.16
@@ -103,13 +104,13 @@ In Mac, you need to install graphviz to run the following command. For that you 
 
 See if everything is ready to be ran:
     
-    $ conda activate VariantsGATK4
+    $ conda activate Variants
     $ snakemake --snakefile LichenPloidy.smk --configfile LichenPloidy_config.yaml -pn
 
 Run the pipeline:
 
     $ screen -R LichenPloidy
-    $ conda activate VariantsGATK4
+    $ conda activate Variants
     $ snakemake --snakefile LichenPloidy.smk --configfile LichenPloidy_config.yaml -p --cluster "sbatch -A snicXXXX-X-XXX -p core -n {params.threads} -t {params.time} --mail-user xxxxx@xxxxxxx.xxx --mail-type=ALL" -j 10 --keep-going --use-conda &> LichenPloidy_snakemake.log &
 
 Where `snicXXXX-X-XXX` is your Uppmax project. Change also your email.
