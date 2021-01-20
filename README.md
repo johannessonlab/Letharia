@@ -6,3 +6,4 @@ There are two main folders:
 
 - **MAT annotation:** gene annotation of the MAT locus of the genus *Letharia*, designed to run in UPPMAX (Uppsala Multidisciplinary Center for Advanced Computational Science).
 - **Lichen Ploidy:** a Snakemake pipeline to infer the ploidy (*sensu lato*, since it would include heterokaryosis) from a (meta)genome, as well as additional analysis to show that the triploid-like samples look like hybrids.
+- **OtherFigures** script and data necessary for other figures, mostly related to the repeat content.
