@@ -74,7 +74,6 @@ rule neededscripts:
 	# About ancient() see https://bitbucket.org/snakemake/snakemake/pull-requests/119/ancient-flag-on-input-files/diff
 	output:
 		"scripts/renameRMDLconsensi.pl",
-		"scripts/totalcovergff.py"
 	shell:
 		"cd scripts; "
 		"wget https://raw.githubusercontent.com/genomicrocosm/physaliaTEcourse/master/Practical2_Computational_annotation/renameRMDLconsensi.pl"
