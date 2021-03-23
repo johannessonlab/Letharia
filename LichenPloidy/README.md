@@ -1,15 +1,9 @@
 # LichenPloidy: Small pipeline to infer the ploidy of a genome or metagenome
-
-TODO:
-
-- Put SPAdes assembly of lupina culture
-- Put McKenzie TE library
-
 ----
 
 This pipeline is designed to calculate the minor allele frequency (MAF) distribution of a given sample based on the read counts of biallelic SNPs. In this case, the objective is to get MAF distributions of all *Letharia* samples using the *L. lupina* pure culture as a reference.
 
-In addition, I also explore the distribution of alleles along the contigs and I try to estimate a rough distance with the other lineages.
+In addition, I also explore the distribution of alleles along the contigs and I try to estimate a rough distance with the other lineages. That estimation was done for the [preprint](https://www.biorxiv.org/content/10.1101/2020.12.18.423428v1) but I decided to remove it for the final publication in favor of another strategy. I keep it here for documentation.
 
 The pipeline relies on the following scripts:
 
