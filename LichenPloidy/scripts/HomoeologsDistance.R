@@ -8,7 +8,7 @@
 # Sandra Lorena Ament Velasquez
 # Johannesson Lab, Evolutionary Biology Center, Uppsala University, Sweden
 # 2020-06-18
-# Version 1
+# Version 2
 # =======================================
 # https://github.com/knausb/vcfR
 # browseVignettes(package="vcfR")
@@ -20,6 +20,7 @@ library(vcfR)
 library(tidyr) # For gather
 library(plyr) # For revalue and count (it has to be before dplyr to avoid conflicts)
 library(dplyr)
+library(cowplot)
 
 # ============================
 # Data
@@ -38,7 +39,7 @@ names(vcffix)[2] <- "SITE"
 # MAke it numeric
 vcffix$SITE <- as.numeric(as.character(vcffix$SITE))
 
-# Modify colum of CHROM + POS to match vcfdf
+# Modify column of CHROM + POS to match vcfdf
 vcffix2 <- vcffix %>% unite(POS, CHROM, SITE, sep = "_", remove = FALSE)
 
 ### ----- The variable part of the vcf file ----
@@ -49,7 +50,7 @@ coverage <- extract.gt(vcf, element="Cov", as.numeric = TRUE) %>% data.frame() %
 reads1 <- extract.gt(vcf, element="Reads1", as.numeric = TRUE) %>% data.frame() %>% tibble::rownames_to_column("POS") %>% gather("species", "allele1", -POS)
 reads2 <- extract.gt(vcf, element="Reads2", as.numeric = TRUE) %>% data.frame() %>% tibble::rownames_to_column("POS") %>% gather("species", "allele2", -POS)
 
-## Merge database and filter out sites with more than 2 alleles
+## Merge dataframe and filter out sites with more than 2 alleles
 vcfdf <- cbind(coverage, allele1 = reads1$allele1, allele2 = reads2$allele2) %>% filter((allele1 + allele2) == cov)
 # Warning: Notice that done like this some sites will be missing for some
 # species, but because I have so much data I think I can afford a few
@@ -151,6 +152,18 @@ snpdistance <- function(species1, species2){
   return(distance)
 }
 
+# Retain only sites with the 5 samples
+keepcompletesites <- function(prematrix){
+  goodsites <- prematrix %>% plyr::count("POS") %>% filter(freq == 5) %>% .$POS # I have to say exactly where "count" came from to avoid conflict with dplyr
+  return(goodsites)
+}
+
+cleanmatrix <- function(prematrix){
+  goodsites <- keepcompletesites(prematrix)
+  prematrix <- prematrix %>% filter(POS %in% goodsites)
+  return(prematrix)
+}
+
 ## From the prematrix produce a data frame with distances against the other species
 prematrix2distance <- function(prematrix){
   # Remove all sites that have missing data (there are 5 taxa)
@@ -181,17 +194,22 @@ prematrix2distance <- function(prematrix){
 }
 
 # Make a data frame with the distances and fancy names for the panels
-lethariadiv_all <- rbind(cbind(region = paste0("Polymorphic (n = ", prematrix$POS %>% unique() %>% length(), ")" ), prematrix2distance(prematrix)),
-                         cbind(region = paste0("Fixed other (n = ", prematrix_altfix$POS %>% unique() %>% length(), ")" ), prematrix2distance(prematrix_altfix)),
-                         cbind(region = paste0("Fixed lupina (n = ", prematrix_reffix$POS %>% unique() %>% length(), ")" ), prematrix2distance(prematrix_reffix)) )
+# In the version 1 I was using the unfiltered number of SNPs before :/, now it's using the filtered one
+lethariadiv_all <- rbind(cbind(region = paste0("Polymorphic (n = ", keepcompletesites(prematrix) %>% length(), ")" ), prematrix2distance(prematrix)),
+                         cbind(region = paste0("Fixed other (n = ", keepcompletesites(prematrix_altfix) %>% length(), ")" ), prematrix2distance(prematrix_altfix)),
+                         cbind(region = paste0("Fixed lupina (n = ", keepcompletesites(prematrix_reffix) %>% length(), ")" ), prematrix2distance(prematrix_reffix)) )
 
 # Replace the alternative lupina for the parts that are fixed for the pure culture with NAs
-lethariadiv_all <- lethariadiv_all %>% mutate(L.lupina_alt = ifelse(region == paste0("Fixed lupina (n = ", prematrix_reffix$POS %>% unique() %>% length(), ")" ), NA, L.lupina_alt))
+lethariadiv_all <- lethariadiv_all %>% mutate(L.lupina_alt = ifelse(region == paste0("Fixed lupina (n = ", keepcompletesites(prematrix_reffix) %>% length(), ")" ), NA, L.lupina_alt))
 
 cat("Plotting ...\n")
 # Make a long format that ggplot likes
 lethariadiv_all_long <- lethariadiv_all %>% gather(key = allele, value = Distance, -region, -Species )
 
+# Force the order of the panels later to start with the polymorphic sites and then the fixed categories
+lethariadiv_all_long <- transform(lethariadiv_all_long, region = factor(region, levels = c(lethariadiv_all_long$region %>% unique())))
+
+# Distance figure in the preprint but removed from final publication
 distanceplot <- ggplot(lethariadiv_all_long, aes(x = Species, y = Distance, colour = allele, shape = allele)) + 
   geom_point(size = 3.5) + 
   ylab("Proportion of sites that have different alleles") +
@@ -201,7 +219,56 @@ distanceplot <- ggplot(lethariadiv_all_long, aes(x = Species, y = Distance, colo
   scale_color_manual(values = c("darkgoldenrod3", "chartreuse4"), labels = c("other", "lupina")) + # Lupina is green in the phylogenies
   scale_shape_manual(values = c(19, 15), labels = c("other", "lupina"))
 
-# ggsave(plot = distanceplot, "/Users/Lorena/Dropbox/PhD_UU/Analyses/Letharia/3_LethariaPloidy/results/Lichens-snps-miss1-100kp_MAF-noTEs_distance.pdf", width = 8.3, height = 3.2)
 ggsave(plot = distanceplot, snakemake@output$distance, width = 8.3, height = 3.2)
 
-cat("Done!")
+cat("Almost done!")
+
+# ============================
+# Is the coverage different for sites that are fixed for the other or the lupina allele?
+# ============================
+
+vcfdf_lupinaMG_alleles <- vcfdf_gtf %>% filter(species == "L.lupina") %>% mutate(REF = allele1/cov, ALT = allele2/cov) %>% # Make new columns with the frequencies of each allele
+  select(-c("allele1", "allele2")) %>%                                                        # Remove the raw counts because I won't need them anymore
+  gather("allele", "cov_allele", -c(POS, species, cov, maf, CHROM, SITE) )                    # Make a long format with the allele and its frequency
+
+# Just keep SNPs that are approx. fixed for either alelle
+vcfdf_lupinaMG_allele_cov <- vcfdf_lupinaMG_alleles %>% filter(allele == "REF") %>% # Each site has a REF and ALT version so just keep one
+  mutate(type = ifelse(cov_allele >= 0.9, "lupina", ifelse(cov_allele <= 0.1, "other", "polymorphic"))) #%>% filter(type == "polymorphic", maf > 0.2) # The last step is to match the Distance table
+
+
+# Polymorphic sites
+vcfdf_lupinaMG_allele_cov <- rbind(cleanmatrix(prematrix) %>% filter(species == "L.lupina") %>% mutate(type = "polymorphic"),
+                                   cleanmatrix(prematrix_reffix) %>% filter(species == "L.lupina") %>% mutate(type = "lupina"),
+                                   cleanmatrix(prematrix_altfix) %>% filter(species == "L.lupina") %>% mutate(type = "other"))
+vcfdf_lupinaMG_allele_cov <- vcfdf_lupinaMG_allele_cov %>% filter(cov < 150)
+
+## Plot
+fixedSNPscov <- ggplot(vcfdf_lupinaMG_allele_cov, aes(x = type, y = cov)) + 
+  geom_violin(fill="#C0C0C0", adjust=1.0, scale = "count", trim=TRUE) +
+  #facet_grid(allele ~ .) +
+  theme_bw() + ylab("Depth of coverage") +
+  theme(axis.title.x = element_blank(),
+        plot.title = element_text(size = 11)) +
+  stat_summary(fun='median', geom='point', size=2, col='red') +
+  ggtitle("All sites")
+
+# Is it an effect of just having more SNPs?
+equalsizesdf <- rbind(vcfdf_lupinaMG_allele_cov %>% filter(type == "other"),
+                      vcfdf_lupinaMG_allele_cov %>% filter(type == "lupina") %>% sample_n(vcfdf_lupinaMG_allele_cov %>% filter(type == "other") %>% dim() %>% .[1]),
+                      vcfdf_lupinaMG_allele_cov %>% filter(type == "polymorphic") %>% sample_n(vcfdf_lupinaMG_allele_cov %>% filter(type == "other") %>% dim() %>% .[1]))
+equalsizesdf$type <- factor(equalsizesdf$type)
+
+equalsizescov <- ggplot(equalsizesdf, aes(x = type, y = cov)) + 
+  geom_violin(fill="#C0C0C0", adjust=1.0, scale = "count", trim=TRUE) +
+  theme_bw() + ylab("Depth of coverage") +
+  theme(axis.title.x = element_blank(),
+        plot.title = element_text(size = 11)) +
+  stat_summary(fun='median', geom='point', size=2, col='red') +
+  ggtitle("Subsampled to match the sites fixed for the 'other' allele")
+
+# Put them together
+typesitescov <- plot_grid(fixedSNPscov, equalsizescov, labels = c('A', 'B'), label_size = 12, nrow = 2)
+
+ggsave(plot = typesitescov, snakemake@output$coverage, width = 4.5, height = 5)
+
+cat("Now really done!")
