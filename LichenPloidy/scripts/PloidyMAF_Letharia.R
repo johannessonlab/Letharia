@@ -11,8 +11,8 @@
 # =======================================
 # Sandra Lorena Ament Velasquez
 # Johannesson Lab, Evolutionary Biology Center, Uppsala University, Sweden
-# 2020-06-18
-# Version 1
+# 2020-06-18 - 2021-03-23
+# Version 2
 # =======================================
 # https://github.com/knausb/vcfR
 # browseVignettes(package="vcfR")
@@ -138,9 +138,13 @@ vcfdf_lupinaMG_df <- vcfdf_lupinaMG_alleles %>% separate(POS, into = c(NA, NA, N
 # Make SITE numeric
 vcfdf_lupinaMG_df$SITE <- as.numeric(vcfdf_lupinaMG_df$SITE)
 
+# Write this data frame to be used later
+LlupinaMG_SNPs <- snakemake@output$SNPs
+write.table(vcfdf_lupinaMG_df, file = LlupinaMG_SNPs, sep = "\t", quote = FALSE, row.names = FALSE)
+
 ### ---------------
 # A function to create windows of MAF per windows using a non-overlapping window size
-winmafperwin <- function(dfmaf, chrlines, windowsize = 50000){
+winmafperwin <- function(dfmaf, chrlines, windowsize = 50000, minsnps = 0){
   ## Notice that chrlines is a data frame with two columns, chr and positions, like such:
   #             chr positions
   # 1 chromosome_1   8813524
@@ -167,8 +171,14 @@ winmafperwin <- function(dfmaf, chrlines, windowsize = 50000){
       for (i in 2:n-1){
         currentwin <- chrsamplemaf %>% filter(SITE >= starts[i] & SITE < starts[i+1])
         chunk <- currentwin$cov_allele %>% median()
+        nsnps_win <- currentwin$cov_allele %>% length()
         
-        winmaf <- rbind(winmaf, data.frame(CHROM = chromi, species = sample, SITE = starts[i], cov_allele = chunk))
+        if (nsnps_win >= minsnps) {
+          winmaf <- rbind(winmaf, data.frame(CHROM = chromi, species = sample, SITE = starts[i], cov_allele = chunk))
+        } else {
+          winmaf <- rbind(winmaf, data.frame(CHROM = chromi, species = sample, SITE = starts[i], cov_allele = NA))
+        }
+        
       }
     }
   }
@@ -183,7 +193,6 @@ vcfdf_lupinaMG_df_ALT <- vcfdf_lupinaMG_df %>%
   filter(maf >= 0.01) %>% 
   sample_n(size = 50000) # Use slice_sample(n = 50000) for higher versions of dyplir
    
-
 # Make a data frame with the contigs and their lengths
 relevantchr <- data.frame(CHROM = vcfdf_lupinaMG_df %>% filter(as.numeric(len) >= 1000000) %>% .$CHROM %>% unique()) # Just the big contigs
 chrlines <- data.frame(CHROM = relevantchr$CHROM, len = relevantchr %>% separate(CHROM, into = c(NA, NA, NA, "len", NA, NA), sep ="_") %>% .$len %>% as.numeric)
@@ -217,18 +226,29 @@ ggsave(plot = vcfdf_lupinaMG_LOH, snakemake@output$loh, width = 10, height = 10)
 # ============================
 cat("Plotting allele frequencies along the MAT contig ...\n")
 # Genes in the idiomorph
-gff <- read.table(gff_file) %>% filter(V3 == "gene") %>% data.frame
+gff2genenames <- function(gff){
+  # version 2
+  genenames <- c()
+  for(i in 1:nrow(gff)){
+    attrib <- gff[i,9] %>% as.character() %>% strsplit(.,";") %>% .[[1]]
+    name <- attrib[pmatch("Name=", attrib)] %>% strsplit(.,"=") %>% .[[1]] %>% .[2]
+    genenames <- c(genenames, name)
+  }
+  gff <- cbind(gff, genenames) %>% select(V1, V3, V4, V5, genenames)
+  return(gff)
+}
+
+gff <- read.table(gff_file) %>% filter(V3 == "gene") %>% data.frame %>% gff2genenames() %>% filter(!genenames %in% c("APN2", "SLA2"))
 
 # Make a data frame with the gff
 bottomy <- -0.003 # A lower position for the genes
 genes <- data.frame(allele = "REF", x1 = gff$V4, y1 = bottomy, x2 = gff$V5, y2 = bottomy)
 
 # Make a data frame with the contigs and their lengths
-relevantchr_mat <- data.frame(CHROM = "NODE_87_length_133277_cov_84.8955") # Just the big contigs
+relevantchr_mat <- data.frame(CHROM = "NODE_87_length_133277_cov_84.8955")
 chrlines_mat <- data.frame(CHROM = relevantchr_mat$CHROM, len = relevantchr_mat %>% separate(CHROM, into = c(NA, NA, NA, "len", NA, NA), sep ="_") %>% .$len %>% as.numeric)
 
 ## Calculate the windows
-
 vcfdf_lupinaMG_df_mat <- vcfdf_lupinaMG_df %>% 
   filter(CHROM == "NODE_87_length_133277_cov_84.8955") %>%
   filter(maf >= 0.01) # Remove obvious sequencing errors
