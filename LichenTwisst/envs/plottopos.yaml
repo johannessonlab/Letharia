@@ -1,0 +1,13 @@
+channels:
+  - bioconda
+  - defaults
+  - conda-forge
+  # - r # Some dependencies do not work together when I set this
+dependencies:
+  - r-vcfr=1.10.0
+  - r-cowplot=1.0.0 # it comes with ggplot2 3.1.1
+  - r-tidyr=0.8.3 # included dplyr (the newer version creates conflicts)
+  - r-vegan=2.5_6
+  - r-plyr=1.8.6
+  - r-phangorn=2.5.5
+

@@ -1,0 +1,25 @@
+### Configuration file of LichenDistances: Trying to guess the origin of the homeologs within the triploid L. lupina metagenome
+# ==================================================
+# Sandra Lorena Ament Velasquez
+# Johannesson Lab, Evolutionary Biology Center, Uppsala University, Sweden
+# 2021/03/08
+# +++++++++++++++++++++++++++++++++++++++++++++++++
+# Version 1
+
+# Data
+vcffile: "../LichenPloidy/variants/Lichens-snps-miss1-100kp-noTEs.vcf" # Produced by the  LichenPloidy.smk pipeline
+snpsMGdf: "../LichenPloidy/results/Lichens-snps-miss1-100kp-noTEs_lupinaMG_SNPs.txt" # Produced by the  LichenPloidy.smk pipeline
+gffmat: "../LichenPloidy/data/MAT_lupina.sorted_Slice_46010_0.gff"
+
+# Parameters
+matctg: "NODE_87_length_133277_cov_84.8955"
+
+# Environments
+renvironment: "envs/plottopos.yaml"
+
+# Scripts
+Trees4TwisstMAT: "scripts/Trees4TwisstMAT.R"
+Trees4TwisstAll: "scripts/Trees4TwisstAll.R"
+LethariaTwisstPlotMAT: "scripts/LethariaTwisstPlotMAT.R"
+LethariaTwisstPlotAll: "scripts/LethariaTwisstPlotAll.R"
+
