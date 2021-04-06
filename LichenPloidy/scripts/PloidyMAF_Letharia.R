@@ -82,6 +82,7 @@ ggsave(plot = mafplot, snakemake@output$maf, width = 10, height = 2.5)
 # ============================
 cat("Plotting coverage distribution ...\n")
 # vignette('sequence_coverage')
+# Notice that here the sites that are homozygous have been removed! So this plot is not enterily representative
 covplot <- ggplot(vcfdf %>% filter(cov < 500), aes(x=species, y=cov)) + 
   geom_violin(fill="#C0C0C0", adjust=1.0, scale = "count", trim=TRUE) +
   theme_bw() + ylab("Depth of coverage") +
