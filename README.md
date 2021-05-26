@@ -2,7 +2,7 @@
 
 Here you'll find the scripts and pipelines associated to the study [Ament-Velásquez, Tuovinen, et al. (2020). The plot thickens: Haploid and triploid-like thalli, hybridization, and biased mating type ratios in Letharia. Front. Fungal Biol. 2:656386](https://www.frontiersin.org/articles/10.3389/ffunb.2021.656386/full).
 
-There are two main folders:
+There are four main folders:
 
 - **MAT annotation:** gene annotation of the MAT locus of the genus *Letharia*, designed to run in UPPMAX (Uppsala Multidisciplinary Center for Advanced Computational Science).
 - **Lichen Ploidy:** a Snakemake pipeline to infer the ploidy (*sensu lato*, since it would include heterokaryosis) from a (meta)genome, as well as additional analysis to show that the triploid-like samples look like hybrids.
