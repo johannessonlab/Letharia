@@ -1,6 +1,6 @@
 # Scripts and pipelines used in the *Letharia* study of the Johannesson's Lab
 
-Here you'll find the scripts and pipelines associated to the study [Ament-Velásquez, S. L., Tuovinen, et al. (2020). The plot thickens: Haploid and triploid-like thalli, hybridization, and biased mating type ratios in Letharia. bioRxiv](https://www.biorxiv.org/content/10.1101/2020.12.18.423428v1). 
+Here you'll find the scripts and pipelines associated to the study [Ament-Velásquez, S. L., Tuovinen, et al. (2020). The plot thickens: Haploid and triploid-like thalli, hybridization, and biased mating type ratios in Letharia. Front. Fungal Biol. 2:656386](https://www.frontiersin.org/articles/10.3389/ffunb.2021.656386/full).
 
 There are two main folders:
 
