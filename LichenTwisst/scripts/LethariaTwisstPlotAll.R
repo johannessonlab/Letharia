@@ -2,7 +2,7 @@
 
 ### Plot topologies along the Letharia contigs
 #############################################################################
-# Part of the LichenPloidy.smk pipeline
+# Part of the LichenTwisst.smk pipeline
 # =======================================
 # Sandra Lorena Ament Velasquez
 # Johannesson Lab, Evolutionary Biology Center, Uppsala University, Sweden

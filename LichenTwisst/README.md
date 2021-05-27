@@ -1,4 +1,4 @@
-# LichenDistances: Trying to guess the origin of the homeologs within the triploid *L. lupina* metagenome
+# LichenTwisst: Trying to guess the origin of the homeologs within the triploid *L. lupina* metagenome
 
 In this pipeline I attempt to phase the triploid *L. lupina* metagenome using the pure-cultre *L. lupina* genome as reference. The idea is to take the alternative allele along the genome and make little SNP windows. Inspired by the basic logic of Twisst ([Martin & Van Belleghem 2017 Genetics 206:429–438](https://www.genetics.org/content/206/1/429)) for plotting, I make little trees from the SNP windows, and classify the found topologies based on who is the sister of the lupinas. (There is no topological weighting because there is only one sequence per species, in a sense).
 
@@ -40,8 +40,8 @@ It looks like so:
 
 ```yaml
 # Data
-vcffile: "../LichenPloidy/variants/Lichens-snps-miss1-100kp-noTEs.vcf" # Produced by the  LichenPloidy.smk pipeline
-snpsMGdf: "../LichenPloidy/results/Lichens-snps-miss1-100kp-noTEs_lupinaMG_SNPs.txt" # Produced by the  LichenPloidy.smk pipeline
+vcffile: "../LichenPloidy/variants/Lichens-snps-miss1-100kp-noTEs.vcf" # Produced by the LichenPloidy.smk pipeline
+snpsMGdf: "../LichenPloidy/results/Lichens-snps-miss1-100kp-noTEs_lupinaMG_SNPs.txt" # Produced by the LichenPloidy.smk pipeline
 gffmat: "../LichenPloidy/data/MAT_lupina.sorted_Slice_46010_0.gff"
 
 # Parameters
@@ -70,13 +70,13 @@ In Mac, you need to install graphviz to run the following command. For that you 
 
 See if everything is ready to be ran:
     
-    $ conda activate TwisstEnv
+    $ conda activate twisst
     $ snakemake --snakefile LichenTwisst.smk --configfile LichenTwisst_config.yaml -pn
 
 Run the pipeline:
 
     $ screen -R LichenTwisst
-    $ conda activate TwisstEnv
+    $ conda activate twisst
     $ snakemake --snakefile LichenTwisst.smk --configfile LichenTwisst_config.yaml -p --cluster "sbatch -A snicXXXX-X-XXX -p core -n {params.threads} -t {params.time} --mail-user xxxxx@xxxxxxx.xxx  --mail-type=ALL" -j 10 --keep-going --use-conda &> LichenTwisst.log &
 
 Where `snicXXXX-X-XXX` is your Uppmax project. Change also your email.
