@@ -55,7 +55,8 @@ rule all:
 		f"results/Lichens-snps-miss1-{int(minlen/1000)}kp_lupina_LOH-noTEs.png",
 		f"results/Lichens-snps-miss1-{int(minlen/1000)}kp_lupina_mat-noTEs.png",
 		f"results/Lichens-snps-miss1-{int(minlen/1000)}kp_MAF-noTEs_distance.pdf",
-		f"RepeatMasker/{refsampleid}.fa.out.gff"
+		f"RepeatMasker/{refsampleid}.fa.out.gff",
+		f"results/Lichens-snps-miss1-{int(minlen/1000)}kp-noTEs_lupinaMG_SNPs.txt", # For the LichenTwisst.smk pipeline
 
 # ------- PREPARE ALL DATA --------
 rule referencegenome:
@@ -297,6 +298,7 @@ rule plotMAF:
 		unmaf = f"results/Lichens-snps-miss1-{int(minlen/1000)}kp_lupina_unMAF-noTEs.pdf", 
 		loh = f"results/Lichens-snps-miss1-{int(minlen/1000)}kp_lupina_LOH-noTEs.png", 
 		mat = f"results/Lichens-snps-miss1-{int(minlen/1000)}kp_lupina_mat-noTEs.png", 
+		SNPs = f"results/Lichens-snps-miss1-{int(minlen/1000)}kp-noTEs_lupinaMG_SNPs.txt",
 	conda: 
 		"envs/plotmaf.yaml"
 	script:
