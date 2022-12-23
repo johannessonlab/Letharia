@@ -246,7 +246,7 @@ rule remove_small_scf:
 				outputvcf.write(f"##FORMAT=<ID=P-value,Number=R,Type=Float,Description='P-value'>\n")
 
 				# Get the names of the samples
-				individuals = '\t'.join(sorted(samples))
+				individuals = '\t'.join(samples)
 
 				# Print a new header
 				outputvcf.write(f"#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t{individuals}\n")
